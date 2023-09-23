@@ -89,7 +89,7 @@ function incompleteTasks(){
        <div v-for="task in showTasks" :key="task.id" class="card" :style="{backgroundColor:task.backgroundColor}">
         <div class="title-bar">
         <h2>{{ task.title }}</h2>
-        <button class="delete" @click="deleteTask(task.id)"><img src="images/delete.png" alt="delete"/></button>
+        <button class="delete" @click="deleteTask(task.id)"><img src="/images/delete.png" alt="delete"/></button>
         </div>  
           <p class="details">{{ task.details }}</p>
           
