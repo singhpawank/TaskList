@@ -7,6 +7,7 @@ Features:
 - Delete Task
 - Mark task completed
 - Filter task based on completion status
+- Error handling
 
 ## Recommended IDE Setup
 
