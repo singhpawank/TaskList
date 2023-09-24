@@ -37,7 +37,16 @@ const createTask = () => {
 function deleteTask(taskId) {
   const taskIndex = tasks.value.findIndex((task) => task.id === taskId);
   if (taskIndex !== -1) {
+
     tasks.value.splice(taskIndex, 1);
+
+    if(activeFilter === "completed"){
+      completedTasks();
+    }else if(activeFilter==="incomplete"){
+      incompleteTasks();
+    }else{
+      allTasks();
+    }
   }
 }
 
