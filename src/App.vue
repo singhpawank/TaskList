@@ -191,20 +191,32 @@ function incompleteTasks(){
 }
 
 .tasks{
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 33% 33% 33%;
+  justify-content: space-between;
   margin: 20px auto;
   max-width: 960px;
+  padding: 0 10px;
 }
 
+@media (max-width: 900px) {
+  .tasks{
+    grid-template-columns: 50% 50%;
+  }
+}
+
+@media (max-width:600px) {
+  .tasks{
+    grid-template-columns: 100%;
+  }
+}
 .card{
-  width: 300px;
+  width: 280px;
   padding: 5px 10px;
   background-color: rgb(123, 32, 45);
   display: flex;
   flex-direction: column;
-  margin-right: 20px;
-  margin-bottom: 20px;
+  margin:10px auto;
   border-radius: 8px;
   color: black;
 }
@@ -240,6 +252,7 @@ function incompleteTasks(){
   display: flex;
   justify-content: space-between;
   margin-top: auto;
+  height: 24px;
 }
 .status p{
   font-size: 12px;
