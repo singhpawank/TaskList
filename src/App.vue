@@ -27,10 +27,12 @@ const createTask = () => {
   title.value = "";
   details.value = "";
   errorMessage.value = "";
-  AllTasks();
+  if(activeFilter==="all"){
+    allTasks();
+  }else if(activeFilter==="incomplete"){
+    incompleteTasks();
+  }
 };
-
-
 
 function deleteTask(taskId) {
   const taskIndex = tasks.value.findIndex((task) => task.id === taskId);
@@ -44,11 +46,16 @@ function markComplete(taskId){
   if (taskIndex !== -1) {
     tasks.value[taskIndex].status = true;
   }
+  
+  if(activeFilter==="incomplete"){
+    incompleteTasks();
+  }
 }
+
 const showTasks = ref(tasks.value);
 
 let activeFilter = "all";
-function AllTasks(){
+function allTasks(){
   activeFilter = "all";
    showTasks.value = tasks.value;
    
@@ -57,13 +64,11 @@ function AllTasks(){
 function completedTasks(){
   activeFilter = "completed";
    showTasks.value = tasks.value.filter((task) => task.status);
-   
 }
 
 function incompleteTasks(){
   activeFilter = "incomplete";
   showTasks.value = tasks.value.filter((task) => !task.status);
-   
 }
 
 </script>
@@ -81,7 +86,7 @@ function incompleteTasks(){
       <button @click="createTask" >Create Task</button>
     </div>
     <div class="filter">
-      <button @click="AllTasks" :class="{ 'active-filter': activeFilter === 'all' }">All</button>
+      <button @click="allTasks" :class="{ 'active-filter': activeFilter === 'all' }">All</button>
       <button @click="completedTasks" :class="{ 'active-filter': activeFilter === 'completed' }">Completed</button>
       <button @click="incompleteTasks" :class="{ 'active-filter': activeFilter === 'incomplete' }">Incomplete</button>
     </div>
