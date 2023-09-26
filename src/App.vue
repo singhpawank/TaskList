@@ -88,9 +88,9 @@ function addProgressMark(){
     </header>
 
     <div class="create">
-      <input class="marks" v-model.trim="progressMark" type="text" placeholder="progress marks"/>
+      <input class="marks" v-model.trim="progressMark" type="text" placeholder="progress mark..."/>
       <p v-if="errorMessage2">{{ errorMessage2 }}</p>
-      <button @click="addProgressMark">Add Progress Mark</button>
+      <button @click="addProgressMark">Add a progress mark</button>
     </div>
 
     <div class="create">
@@ -202,7 +202,7 @@ function addProgressMark(){
    border-radius: 5px;
    color: white;
    cursor: pointer;
-   /* margin-top: 8px; */
+   margin-top: 8px;
 }
 .create p{
   color: rgb(193, 15, 15);
