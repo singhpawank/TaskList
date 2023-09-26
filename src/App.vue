@@ -3,6 +3,8 @@ import { ref } from "vue";
 
 const title = ref("");
 const details = ref("");
+const progressMarks = ref("");
+const selectedOption =  ref("");
 
 const tasks = ref([]);
 const errorMessage = ref("");
@@ -19,7 +21,8 @@ const createTask = () => {
     id: Math.floor(Math.random() * 1000000),
     title: title.value,
     details: details.value,
-    status: false,
+    status: "start",
+    progressMarks: progressMarks.value.split(','),
     date: new Date(),
     backgroundColor: getRandomColor(),
   });
@@ -27,6 +30,8 @@ const createTask = () => {
   title.value = "";
   details.value = "";
   errorMessage.value = "";
+  progressMarks.value = "";
+
   if(activeFilter==="all"){
     allTasks();
   }else if(activeFilter==="incomplete"){
@@ -61,6 +66,12 @@ function markComplete(taskId){
   }
 }
 
+function makeProgress(taskId, selectedOption){
+  const taskIndex = tasks.value.findIndex((task) => task.id === taskId);
+  if (taskIndex !== -1) {
+    tasks.value[taskIndex].status = selectedOption;
+  }
+}
 const showTasks = ref(tasks.value);
 
 let activeFilter = "all";
@@ -92,6 +103,7 @@ function incompleteTasks(){
       <input v-model.trim="title" type="text" placeholder="Title..."/>
       <textarea v-model.trim="details" name="task" id="task" cols="30" rows="4" placeholder="Details..."></textarea>
       <p v-if="errorMessage">{{ errorMessage }}</p>
+      <input class="marks" v-model.trim="progressMarks" type="text" placeholder="progress marks"/>
       <button @click="createTask" >Create Task</button>
     </div>
     <div class="filter">
@@ -99,6 +111,7 @@ function incompleteTasks(){
       <button @click="completedTasks" :class="{ 'active-filter': activeFilter === 'completed' }">Completed</button>
       <button @click="incompleteTasks" :class="{ 'active-filter': activeFilter === 'incomplete' }">Incomplete</button>
     </div>
+    
     <div class="tasks">
        <div v-for="task in showTasks" :key="task.id" class="card" :style="{backgroundColor:task.backgroundColor}">
         <div class="title-bar">
@@ -108,11 +121,16 @@ function incompleteTasks(){
           <p class="details">{{ task.details }}</p>
           
           <div class="status">
-            <p :style="{color:task.status?'green':'red'}">{{ task.status?"Completed":"Incomplete" }}</p>
-            <div v-if="!task.status">
+            <p>{{ task.status}}</p>
+            <label for="dropdown">Select an option:</label>
+            <select id="dropdown" v-model="selectedOption" @change="makeProgress(task.id, selectedOption)">
+              <option v-for="mark in task.progressMarks" :key="mark" :value="mark">{{ mark }}</option>
+            </select>
+            <!-- <div v-if="!task.status">
               <label for="task.id">Mark completed</label>
               <input type="checkbox" :id="task.id" v-model="task.completed" @change="markComplete(task.id)">
-            </div>
+            </div> -->
+            <!-- {{ task.pregressMarks }} -->
         </div>
         </div>
     </div>
@@ -193,7 +211,7 @@ function incompleteTasks(){
    border-radius: 5px;
    color: white;
    cursor: pointer;
-   margin-top: 8px;
+   /* margin-top: 8px; */
 }
 .create p{
   color: rgb(193, 15, 15);
@@ -275,5 +293,14 @@ function incompleteTasks(){
 
 .status > div > label{
    margin-right: 5px;
+}
+
+option{
+  width: 100px;
+  height: 20px;
+}
+
+.marks{
+  margin-top: 8px;
 }
 </style>
