@@ -3,11 +3,14 @@ import { ref } from "vue";
 
 const title = ref("");
 const details = ref("");
-const progressMarks = ref("");
-const selectedOption =  ref("");
+const progressMarks = ref([]);
+const progressMark = ref("");
+let selectedOption =  "";
+const activeFilter = ref("all");
 
 const tasks = ref([]);
 const errorMessage = ref("");
+const errorMessage2 = ref("");
 function getRandomColor() {
   return "hsl(" + Math.random() * 360 + ", 75%, 75%";
 }
@@ -22,7 +25,6 @@ const createTask = () => {
     title: title.value,
     details: details.value,
     status: "start",
-    progressMarks: progressMarks.value.split(','),
     date: new Date(),
     backgroundColor: getRandomColor(),
   });
@@ -30,7 +32,6 @@ const createTask = () => {
   title.value = "";
   details.value = "";
   errorMessage.value = "";
-  progressMarks.value = "";
 
   if(activeFilter==="all"){
     allTasks();
@@ -42,55 +43,42 @@ const createTask = () => {
 function deleteTask(taskId) {
   const taskIndex = tasks.value.findIndex((task) => task.id === taskId);
   if (taskIndex !== -1) {
-
     tasks.value.splice(taskIndex, 1);
-
-    if(activeFilter === "completed"){
-      completedTasks();
-    }else if(activeFilter==="incomplete"){
-      incompleteTasks();
-    }else{
-      allTasks();
-    }
   }
 }
 
-function markComplete(taskId){
-  const taskIndex = tasks.value.findIndex((task) => task.id === taskId);
-  if (taskIndex !== -1) {
-    tasks.value[taskIndex].status = true;
-  }
-  
-  if(activeFilter==="incomplete"){
-    incompleteTasks();
-  }
-}
-
-function makeProgress(taskId, selectedOption){
+function makeProgress(taskId){
   const taskIndex = tasks.value.findIndex((task) => task.id === taskId);
   if (taskIndex !== -1) {
     tasks.value[taskIndex].status = selectedOption;
   }
+  
+  if(activeFilter===selectedOption){
+    filterTask(selectedOption);
+  }
+  selectedOption="";
 }
+
 const showTasks = ref(tasks.value);
 
-let activeFilter = "all";
-function allTasks(){
-  activeFilter = "all";
-   showTasks.value = tasks.value;
-   
+function filterTask(mark){
+  activeFilter.value = mark;
+  if(mark==="all"){
+    showTasks.value = tasks.value;
+    return;
+  }
+  showTasks.value = tasks.value.filter((task) => task.status===mark);
 }
 
-function completedTasks(){
-  activeFilter = "completed";
-   showTasks.value = tasks.value.filter((task) => task.status);
+function addProgressMark(){
+  if(progressMark.value.length===0){
+    errorMessage2.value = "Progress mark can not be empty!";
+    return;
+  }
+  progressMarks.value.push(progressMark.value);
+  progressMark.value="";
+  errorMessage2.value="";
 }
-
-function incompleteTasks(){
-  activeFilter = "incomplete";
-  showTasks.value = tasks.value.filter((task) => !task.status);
-}
-
 </script>
 
 <template>
@@ -100,16 +88,21 @@ function incompleteTasks(){
     </header>
 
     <div class="create">
+      <input class="marks" v-model.trim="progressMark" type="text" placeholder="progress marks"/>
+      <p v-if="errorMessage2">{{ errorMessage2 }}</p>
+      <button @click="addProgressMark">Add Progress Mark</button>
+    </div>
+
+    <div class="create">
       <input v-model.trim="title" type="text" placeholder="Title..."/>
       <textarea v-model.trim="details" name="task" id="task" cols="30" rows="4" placeholder="Details..."></textarea>
       <p v-if="errorMessage">{{ errorMessage }}</p>
-      <input class="marks" v-model.trim="progressMarks" type="text" placeholder="progress marks"/>
+      
       <button @click="createTask" >Create Task</button>
     </div>
     <div class="filter">
-      <button @click="allTasks" :class="{ 'active-filter': activeFilter === 'all' }">All</button>
-      <button @click="completedTasks" :class="{ 'active-filter': activeFilter === 'completed' }">Completed</button>
-      <button @click="incompleteTasks" :class="{ 'active-filter': activeFilter === 'incomplete' }">Incomplete</button>
+      <button @click="filterTask('all')" :class="{ 'active-filter': activeFilter === 'all' }">All</button>
+      <button @click="filterTask(mark)" v-for="mark in progressMarks" :class="{ 'active-filter': activeFilter === mark }">{{ mark }}</button>
     </div>
     
     <div class="tasks">
@@ -123,14 +116,10 @@ function incompleteTasks(){
           <div class="status">
             <p>{{ task.status}}</p>
             <label for="dropdown">Select an option:</label>
-            <select id="dropdown" v-model="selectedOption" @change="makeProgress(task.id, selectedOption)">
-              <option v-for="mark in task.progressMarks" :key="mark" :value="mark">{{ mark }}</option>
+            <select id="dropdown" v-model="selectedOption" @change="makeProgress(task.id)">
+              <option v-for="mark in progressMarks" :key="mark" :value="mark">{{ mark }}</option>
             </select>
-            <!-- <div v-if="!task.status">
-              <label for="task.id">Mark completed</label>
-              <input type="checkbox" :id="task.id" v-model="task.completed" @change="markComplete(task.id)">
-            </div> -->
-            <!-- {{ task.pregressMarks }} -->
+            {{ selectedOption }}
         </div>
         </div>
     </div>
@@ -154,10 +143,11 @@ function incompleteTasks(){
 
  .filter {
    display: flex;
-   justify-content: center;
+   flex-wrap: wrap;
+   /* justify-content: space-between; */
    align-items: center;
    margin: auto;
-   margin-top: 20px;
+   /* margin: 10px 20px; */
  }
 
  .filter button {
@@ -170,6 +160,7 @@ function incompleteTasks(){
    font-size: 15px;
    font-weight: 700;
    cursor: pointer;
+   margin: 10px;
  }
 
  .active-filter {
@@ -282,8 +273,9 @@ function incompleteTasks(){
   height: 24px;
 }
 .status p{
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold;
+  color: green;
 }
 
 .status div{
